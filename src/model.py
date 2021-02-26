@@ -17,6 +17,15 @@ def drop_id_column(df_input):
     df_input.drop(['Id'], axis=1, inplace=True)
     return df_input
 
+def count_missing_values(df_input):
+    return df_input.isnull().sum()
+
+def fill_missing_values_in_cat_columns(df_input):
+    cat_columns = df_input.select_dtypes(include=['object']).columns
+    print(cat_columns)
+    for col in cat_columns:
+        df_input[col] = df_input[col].fillna("None")
+    return df_input
 
 def main():
     housing = pd.read_csv(r"C:\MyPythonProjects\practice_folder\data\train.csv")
@@ -26,7 +35,7 @@ def main():
 
     # # 1. Dealing with missing values
     housing.isnull().sum().sort_values(ascending=False)
-
+    # count_missing_values(housing).sort_values(ascending=False)
 
     # # 2. Fixing missing values explicitly
 
@@ -43,10 +52,11 @@ def main():
            'SaleType', 'SaleCondition']
     '''
     df = housing
-    cat_columns = df.select_dtypes(include=['object']).columns
-
-    for col in cat_columns:
-        df[col] = df[col].fillna("None")
+    # cat_columns = df.select_dtypes(include=['object']).columns
+    #
+    # for col in cat_columns:
+    #     df[col] = df[col].fillna("None")
+    fill_missing_values_in_cat_columns(df)
 
     #Changing LotFrontage to mean LotFrontage in the same Neighborhood
     df['LotFrontage'] = df.groupby('Neighborhood')['LotFrontage'].transform(lambda x: x.fillna(x.median()))
@@ -71,7 +81,7 @@ def main():
 
     # # 3. Dealing with Outliers
 
-    # Removing noisy data which is above 0.999 quantile
+    # Removing noisy data which is abo ve 0.999 quantile
     num_attributes = df[num_columns]
 
     high_quant = df.quantile(.999)
@@ -300,5 +310,5 @@ def main():
 
     display_scores(rf_rmse_scores)
 
-if __name__ == "__main__"
+if __name__ == "__main__":
     main()
